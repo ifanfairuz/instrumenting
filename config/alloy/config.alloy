@@ -121,13 +121,15 @@ pyroscope.write "default" {
   }
 }
 
-// Pyroscope scrape for pulling profiles (optional)
-// pyroscope.scrape "example" {
-//   targets = [
-//     {"__address__" = "localhost:6060", "service_name" = "my-service"},
-//   ]
-//   forward_to = [pyroscope.write.default.receiver]
-// }
+// Receive profiling data via pprof HTTP endpoint
+pyroscope.receive_http "default" {
+  http {
+    listen_address = "0.0.0.0"
+    listen_port    = 4100
+  }
+
+  forward_to = [pyroscope.write.default.receiver]
+}
 
 // =========================================
 // Self-monitoring (optional)
@@ -139,4 +141,17 @@ prometheus.exporter.self "default" { }
 prometheus.scrape "alloy" {
   targets    = prometheus.exporter.self.default.targets
   forward_to = [prometheus.remote_write.local.receiver]
+}
+
+// =========================================
+// Docker
+// =========================================
+
+discovery.docker "local_containers" {
+ host = "unix:///var/run/docker.sock"
+}
+
+pyroscope.ebpf "instance" {
+ forward_to     = [pyroscope.write.default.receiver]
+ targets = discovery.docker.local_containers.targets
 }

@@ -89,9 +89,11 @@ services:
     #   - "12345:12345"  # Alloy UI
       - "4319:4317"    # OTLP gRPC receiver
       - "4320:4318"    # OTLP HTTP receiver
+      - "4100:4100"    # Pyroscope profiling receiver
     volumes:
       - ./config/alloy/config.alloy:/etc/alloy/config.alloy
       - alloy-data:/var/lib/alloy
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       - observability
     depends_on:
