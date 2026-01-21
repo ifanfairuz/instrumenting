@@ -59,10 +59,15 @@ metrics_generator:
         - http.status_code
       histogram_buckets: [0.002, 0.004, 0.008, 0.016, 0.032, 0.064, 0.128, 0.256, 0.512, 1.024, 2.048, 4.096, 8.192, 16.384]
       enable_target_info: true
+    local_blocks:
+      flush_check_period: 10s
+      max_live_traces: 10000
+      max_block_duration: 5m
+      complete_block_timeout: 1m
 
 # Overrides for tenants
 overrides:
   defaults:
     metrics_generator:
-      processors: [service-graphs, span-metrics]
+      processors: [service-graphs, span-metrics, local-blocks]
       generate_native_histograms: both
