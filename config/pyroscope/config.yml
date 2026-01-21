@@ -17,7 +17,7 @@ server:
 storage:
   backend: filesystem
   filesystem:
-    path: /var/lib/pyroscope
+    dir: /var/lib/pyroscope
 
 # Memberlist (empty for single instance)
 memberlist:
@@ -29,7 +29,7 @@ limits:
 
 # Compactor
 compactor:
-  data_path: /var/lib/pyroscope/compactor
+  data_dir: /var/lib/pyroscope/compactor
   compaction_interval: 10m
 
 # Analytics
