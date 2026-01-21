@@ -30,7 +30,6 @@ query_frontend:
   search:
     default_result_limit: 20
     max_result_limit: 100
-  max_duration: 0  # 0 = no limit on query time range
 
 # Metrics generator configuration
 metrics_generator:
