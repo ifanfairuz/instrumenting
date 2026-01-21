@@ -1,0 +1,47 @@
+# Example: Add this service to your main docker-compose.yml
+# or use it as a standalone compose file alongside the observability stack
+
+services:
+  # Node.js application with auto-instrumentation
+  nodejs-app:
+    build: .
+    container_name: nodejs-example
+    ports:
+      - "3000:3000"
+    environment:
+      # Service identification
+      - OTEL_SERVICE_NAME=nodejs-example
+      - OTEL_RESOURCE_ATTRIBUTES=deployment.environment=docker,service.version=1.0.0,team=backend
+
+      # OTLP Exporter (gRPC to Alloy)
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4317
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+
+      # Enable all signals
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
+
+      # Sampling (100% for development)
+      - OTEL_TRACES_SAMPLER=parentbased_traceidratio
+      - OTEL_TRACES_SAMPLER_ARG=1.0
+
+      # Metric export interval
+      - OTEL_METRIC_EXPORT_INTERVAL=60000
+
+      # Propagators
+      - OTEL_PROPAGATORS=tracecontext,baggage
+
+      # Log level
+      - OTEL_LOG_LEVEL=info
+    networks:
+      - observability
+    depends_on:
+      - alloy
+    restart: unless-stopped
+
+# Connect to the observability network
+networks:
+  observability:
+    external: true
+    name: instrumenting_observability

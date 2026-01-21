@@ -1,12 +1,14 @@
-# Observability Stack with Grafana, Tempo, Loki, and Alloy
+# Complete Observability Stack (LGTM+)
 
-A Docker Compose setup for full-stack observability with distributed tracing, log aggregation, and metrics collection.
+A Docker Compose setup for full-stack observability with **L**oki (logs), **G**rafana (visualization), **T**empo (traces), **M**imir/Prometheus (metrics), and **P**yroscope (profiling).
 
 ## Components
 
 - **Grafana**: Visualization and dashboards (port 3000)
 - **Tempo**: Distributed tracing backend (ports 3200, 4317, 4318)
 - **Loki**: Log aggregation system (port 3100)
+- **Prometheus**: Metrics storage and query engine (port 9090)
+- **Pyroscope**: Continuous profiling platform (port 4040)
 - **Alloy**: OpenTelemetry collector for telemetry data (ports 12345, 4319, 4320)
 
 ## Quick Start
@@ -80,6 +82,36 @@ curl -X POST http://localhost:3100/loki/api/v1/push \
   }'
 ```
 
+## Examples
+
+### Node.js Auto-Instrumentation
+
+We provide a complete Node.js example showing **zero-code-change** instrumentation using only environment variables:
+
+```bash
+cd examples/nodejs-example
+npm install
+
+# Set environment variables (or use .env file)
+export OTEL_SERVICE_NAME=nodejs-example
+export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4320
+export OTEL_TRACES_EXPORTER=otlp
+
+# Run with auto-instrumentation
+npm start
+
+# Generate test traffic
+./generate-traffic.sh 60
+```
+
+See the full guide: [examples/nodejs-auto-instrument.md](examples/nodejs-auto-instrument.md)
+
+Features:
+- Automatic instrumentation of HTTP, Express, and more
+- Full traces, metrics, and logs with zero code changes
+- Docker-ready with example Dockerfile
+- Traffic generator for testing
+
 ## Configuration
 
 All configurations are stored in the `config/` directory and can be easily customized.
@@ -91,13 +123,26 @@ All configurations are stored in the `config/` directory and can be easily custo
 ├── docker-compose.yml
 ├── config/
 │   ├── grafana/
-│   │   └── datasources.yml    # Grafana datasource configuration
+│   │   └── datasources.yml         # Grafana datasource configuration
 │   ├── tempo/
-│   │   └── tempo.yml           # Tempo configuration
+│   │   └── tempo.yml                # Tempo configuration
 │   ├── loki/
-│   │   └── loki.yml            # Loki configuration
+│   │   └── loki.yml                 # Loki configuration
+│   ├── prometheus/
+│   │   └── prometheus.yml           # Prometheus configuration
+│   ├── pyroscope/
+│   │   └── config.yml               # Pyroscope configuration
 │   └── alloy/
-│       └── config.alloy        # Alloy configuration (River format)
+│       └── config.alloy             # Alloy configuration (River format)
+├── examples/
+│   ├── nodejs-auto-instrument.md    # Node.js instrumentation guide
+│   ├── nodejs-example/              # Complete Node.js example
+│   │   ├── app.js
+│   │   ├── package.json
+│   │   ├── Dockerfile
+│   │   └── generate-traffic.sh
+│   ├── test-app.py                  # Python test application
+│   └── requirements.txt
 └── README.md
 ```
 
