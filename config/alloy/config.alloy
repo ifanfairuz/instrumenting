@@ -72,16 +72,20 @@ otelcol.exporter.prometheus "default" {
   forward_to = [prometheus.remote_write.local.receiver]
 }
 
-// Prometheus remote write (to Grafana's built-in storage)
+// Prometheus remote write
 prometheus.remote_write "local" {
   endpoint {
-    url = "http://grafana:3000/api/prom/push"
+    url = "http://prometheus:9090/api/v1/write"
 
-    // Optional: Add basic auth if needed
-    // basic_auth {
-    //   username = "admin"
-    //   password = "admin"
-    // }
+    queue_config {
+      capacity             = 10000
+      max_shards           = 50
+      min_shards           = 1
+      max_samples_per_send = 5000
+      batch_send_deadline  = "5s"
+      min_backoff          = "30ms"
+      max_backoff          = "100ms"
+    }
   }
 }
 

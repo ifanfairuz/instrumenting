@@ -43,6 +43,25 @@ services:
       - observability
     restart: unless-stopped
 
+  # Prometheus - Metrics storage and query engine
+  prometheus:
+    image: prom/prometheus:latest
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+    # ports:
+    #   - "9090:9090"
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - observability
+    restart: unless-stopped
+
   # Alloy - Telemetry collector (OpenTelemetry)
   alloy:
     image: grafana/alloy:latest
@@ -63,12 +82,14 @@ services:
     depends_on:
       - tempo
       - loki
+      - prometheus
     restart: unless-stopped
 
 volumes:
   grafana-data:
   tempo-data:
   loki-data:
+  prometheus-data:
   alloy-data:
 
 networks:
