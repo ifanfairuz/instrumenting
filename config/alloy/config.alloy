@@ -1,0 +1,98 @@
+// Logging configuration
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+// =========================================
+// OTLP Receivers
+// =========================================
+
+// OTLP gRPC receiver
+otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+
+  output {
+    metrics = [otelcol.processor.batch.default.input]
+    logs    = [otelcol.processor.batch.default.input]
+    traces  = [otelcol.processor.batch.default.input]
+  }
+}
+
+// =========================================
+// Processors
+// =========================================
+
+// Batch processor for efficiency
+otelcol.processor.batch "default" {
+  timeout          = "5s"
+  send_batch_size  = 100
+
+  output {
+    metrics = [otelcol.exporter.prometheus.default.input]
+    logs    = [otelcol.exporter.loki.default.input]
+    traces  = [otelcol.exporter.otlp.tempo.input]
+  }
+}
+
+// =========================================
+// Exporters
+// =========================================
+
+// Export traces to Tempo
+otelcol.exporter.otlp "tempo" {
+  client {
+    endpoint = "tempo:4317"
+    tls {
+      insecure = true
+    }
+  }
+}
+
+// Export logs to Loki
+otelcol.exporter.loki "default" {
+  forward_to = [loki.write.local.receiver]
+}
+
+// Loki write component
+loki.write "local" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+
+// Export metrics as Prometheus
+otelcol.exporter.prometheus "default" {
+  forward_to = [prometheus.remote_write.local.receiver]
+}
+
+// Prometheus remote write (to Grafana's built-in storage)
+prometheus.remote_write "local" {
+  endpoint {
+    url = "http://grafana:3000/api/prom/push"
+
+    // Optional: Add basic auth if needed
+    // basic_auth {
+    //   username = "admin"
+    //   password = "admin"
+    // }
+  }
+}
+
+// =========================================
+// Self-monitoring (optional)
+// =========================================
+
+// Expose Alloy's own metrics
+prometheus.exporter.self "default" { }
+
+prometheus.scrape "alloy" {
+  targets    = prometheus.exporter.self.default.targets
+  forward_to = [prometheus.remote_write.local.receiver]
+}

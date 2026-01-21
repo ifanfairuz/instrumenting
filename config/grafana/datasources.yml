@@ -1,0 +1,56 @@
+apiVersion: 1
+
+datasources:
+  # Tempo datasource for traces
+  - name: Tempo
+    type: tempo
+    access: proxy
+    uid: tempo
+    url: http://tempo:3200
+    jsonData:
+      httpMethod: GET
+      tracesToLogs:
+        datasourceUid: 'loki'
+        tags: ['job', 'instance', 'pod', 'namespace']
+        mappedTags: [{ key: 'service.name', value: 'service' }]
+        mapTagNamesEnabled: true
+        spanStartTimeShift: '-1h'
+        spanEndTimeShift: '1h'
+        filterByTraceID: true
+        filterBySpanID: false
+      tracesToMetrics:
+        datasourceUid: 'prometheus'
+      serviceMap:
+        datasourceUid: 'prometheus'
+      nodeGraph:
+        enabled: true
+    editable: true
+
+  # Loki datasource for logs
+  - name: Loki
+    type: loki
+    access: proxy
+    uid: loki
+    url: http://loki:3100
+    jsonData:
+      maxLines: 1000
+      derivedFields:
+        - datasourceUid: tempo
+          matcherRegex: "trace_id=(\\w+)"
+          name: TraceID
+          url: '$${__value.raw}'
+    editable: true
+
+  # Prometheus datasource for metrics (optional, if you enable Grafana metrics storage)
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    uid: prometheus
+    url: http://localhost:9090
+    jsonData:
+      httpMethod: POST
+      exemplarTraceIdDestinations:
+        - name: trace_id
+          datasourceUid: tempo
+    editable: true
+    # Note: You may need to set up Prometheus separately or use Grafana Mimir
