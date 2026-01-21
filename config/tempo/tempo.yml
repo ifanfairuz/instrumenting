@@ -30,6 +30,7 @@ query_frontend:
   search:
     default_result_limit: 20
     max_result_limit: 100
+  max_duration: 0  # 0 = no limit on query time range
 
 # Metrics generator configuration
 metrics_generator:
@@ -78,8 +79,8 @@ metrics_generator:
     local_blocks:
       flush_check_period: 10s
       max_live_traces: 10000
-      max_block_duration: 5m
-      complete_block_timeout: 1m
+      max_block_duration: 30m
+      complete_block_timeout: 5m
 
 # Overrides for tenants
 overrides:
@@ -87,3 +88,5 @@ overrides:
     metrics_generator:
       processors: [service-graphs, span-metrics, local-blocks]
       generate_native_histograms: both
+    # Allow queries up to 1 hour back for generated metrics
+    metrics_generator_max_interval: 1h
