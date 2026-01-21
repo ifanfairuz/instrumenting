@@ -37,7 +37,6 @@ metrics_generator:
 
 # Global defaults (no multi-tenancy)
 overrides:
-  defaults:
-    metrics_generator:
-      processors: ["span-metrics", "service-graphs", "local-block"]
-      generate_native_histograms: both
+  metrics_generator_processors: [service-graphs, span-metrics, local-blocks]
+  metrics_generator_max_active_series: 10000
+  metrics_generator_collection_interval: 15s
