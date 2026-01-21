@@ -21,13 +21,34 @@ otelcol.receiver.otlp "default" {
   output {
     metrics = [otelcol.processor.batch.default.input]
     logs    = [otelcol.processor.batch.default.input]
-    traces  = [otelcol.processor.batch.default.input]
+    traces  = [otelcol.processor.filter.default.input]
   }
 }
 
 // =========================================
 // Processors
 // =========================================
+
+// Filter processor to drop health checks and preflight requests
+otelcol.processor.filter "default" {
+  error_mode = "ignore"
+
+  traces {
+    span = [
+      // Drop health check requests
+      "attributes[\"http.target\"] == \"/health\"",
+      "attributes[\"http.route\"] == \"/health\"",
+      "attributes[\"url.path\"] == \"/health\"",
+
+      // Drop preflight OPTIONS requests
+      "attributes[\"http.method\"] == \"OPTIONS\"",
+    ]
+  }
+
+  output {
+    traces = [otelcol.processor.batch.default.input]
+  }
+}
 
 // Batch processor for efficiency
 otelcol.processor.batch "default" {
