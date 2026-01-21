@@ -93,7 +93,11 @@ services:
     volumes:
       - ./config/alloy/config.alloy:/etc/alloy/config.alloy
       - alloy-data:/var/lib/alloy
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /sys/kernel/debug:/sys/kernel/debug:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    pid: host
     networks:
       - observability
     depends_on:
