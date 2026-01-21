@@ -20,6 +20,11 @@ datasources:
         filterBySpanID: false
       tracesToMetrics:
         datasourceUid: 'prometheus'
+      tracesToProfiles:
+        datasourceUid: 'pyroscope'
+        tags: ['job', 'instance', 'pod']
+        profileTypeId: 'process_cpu:cpu:nanoseconds:cpu:nanoseconds'
+        customQuery: true
       serviceMap:
         datasourceUid: 'prometheus'
       nodeGraph:
@@ -52,4 +57,14 @@ datasources:
       exemplarTraceIdDestinations:
         - name: trace_id
           datasourceUid: tempo
+    editable: true
+
+  # Pyroscope datasource for continuous profiling
+  - name: Pyroscope
+    type: grafana-pyroscope-datasource
+    access: proxy
+    uid: pyroscope
+    url: http://pyroscope:4040
+    jsonData:
+      minStep: '15s'
     editable: true

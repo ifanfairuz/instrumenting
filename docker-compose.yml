@@ -63,6 +63,20 @@ services:
       - observability
     restart: unless-stopped
 
+  # Pyroscope - Continuous profiling platform
+  pyroscope:
+    image: grafana/pyroscope:latest
+    command:
+      - '-config.file=/etc/pyroscope/config.yml'
+    # ports:
+    #   - "4040:4040"   # Pyroscope HTTP
+    volumes:
+      - ./config/pyroscope/config.yml:/etc/pyroscope/config.yml
+      - pyroscope-data:/var/lib/pyroscope
+    networks:
+      - observability
+    restart: unless-stopped
+
   # Alloy - Telemetry collector (OpenTelemetry)
   alloy:
     image: grafana/alloy:latest
@@ -84,6 +98,7 @@ services:
       - tempo
       - loki
       - prometheus
+      - pyroscope
     restart: unless-stopped
 
 volumes:
@@ -91,6 +106,7 @@ volumes:
   tempo-data:
   loki-data:
   prometheus-data:
+  pyroscope-data:
   alloy-data:
 
 networks:

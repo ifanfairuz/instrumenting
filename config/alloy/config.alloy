@@ -90,6 +90,25 @@ prometheus.remote_write "local" {
 }
 
 // =========================================
+// Profiling
+// =========================================
+
+// Pyroscope write component for profiling data
+pyroscope.write "default" {
+  endpoint {
+    url = "http://pyroscope:4040"
+  }
+}
+
+// Pyroscope scrape for pulling profiles (optional)
+// pyroscope.scrape "example" {
+//   targets = [
+//     {"__address__" = "localhost:6060", "service_name" = "my-service"},
+//   ]
+//   forward_to = [pyroscope.write.default.receiver]
+// }
+
+// =========================================
 // Self-monitoring (optional)
 // =========================================
 

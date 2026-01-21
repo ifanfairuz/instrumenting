@@ -1,0 +1,47 @@
+---
+# Pyroscope server configuration
+
+# Analytics and telemetry
+analytics:
+  reporting_enabled: false
+
+# Server configuration
+server:
+  http_listen_address: "0.0.0.0"
+  http_listen_port: 4040
+
+# Storage configuration
+storage:
+  path: /var/lib/pyroscope
+
+# Data retention
+limits:
+  # Maximum size of profiling data to store (default: no limit)
+  # max_local_disk_bytes: 10737418240  # 10GB
+
+  # How long to keep profiling data
+  retention: 168h  # 7 days
+
+# Tenancy configuration (multi-tenancy disabled by default)
+multitenancy_enabled: false
+
+# Query limits
+query_frontend:
+  max_outstanding_per_tenant: 100
+
+# Ingester configuration
+ingester:
+  # Maximum number of profiles per push request
+  max_recv_msg_size: 4194304  # 4MB
+
+# Compactor configuration for data retention
+compactor:
+  compaction_interval: 10m
+  retention_enabled: true
+
+# Memberlist configuration (for clustering, disabled in single instance)
+memberlist:
+  join_members: []
+
+# Log level: debug, info, warn, error
+log_level: info
