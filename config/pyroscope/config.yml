@@ -1,47 +1,37 @@
 ---
-# Pyroscope server configuration
+# Pyroscope configuration for Grafana Pyroscope
+# See: https://grafana.com/docs/pyroscope/latest/configure-server/
 
-# Analytics and telemetry
-analytics:
-  reporting_enabled: false
+# Target to run Pyroscope in (all = single instance with all components)
+target: all
 
-# Server configuration
+# Multi-tenancy (disabled for single-instance)
+multitenancy_enabled: false
+
+# Server HTTP configuration
 server:
-  http_listen_address: "0.0.0.0"
   http_listen_port: 4040
+  log_level: info
 
 # Storage configuration
 storage:
-  path: /var/lib/pyroscope
+  backend: filesystem
+  filesystem:
+    path: /var/lib/pyroscope
 
-# Data retention
-limits:
-  # Maximum size of profiling data to store (default: no limit)
-  # max_local_disk_bytes: 10737418240  # 10GB
-
-  # How long to keep profiling data
-  retention: 168h  # 7 days
-
-# Tenancy configuration (multi-tenancy disabled by default)
-multitenancy_enabled: false
-
-# Query limits
-query_frontend:
-  max_outstanding_per_tenant: 100
-
-# Ingester configuration
-ingester:
-  # Maximum number of profiles per push request
-  max_recv_msg_size: 4194304  # 4MB
-
-# Compactor configuration for data retention
-compactor:
-  compaction_interval: 10m
-  retention_enabled: true
-
-# Memberlist configuration (for clustering, disabled in single instance)
+# Memberlist for clustering (empty for single instance)
 memberlist:
   join_members: []
 
-# Log level: debug, info, warn, error
-log_level: info
+# Limits and retention
+limits:
+  max_query_length: 721h  # ~30 days
+
+# Compactor settings
+compactor:
+  data_path: /var/lib/pyroscope/compactor
+  compaction_interval: 10m
+
+# Analytics
+analytics:
+  reporting_enabled: false
