@@ -1,14 +1,14 @@
 ---
 # Pyroscope configuration for Grafana Pyroscope
-# See: https://grafana.com/docs/pyroscope/latest/configure-server/
+# Minimal configuration for single-instance deployment
 
-# Target to run Pyroscope in (all = single instance with all components)
+# Target to run (all = single instance with all components)
 target: all
 
-# Multi-tenancy (disabled for single-instance)
+# Multi-tenancy disabled
 multitenancy_enabled: false
 
-# Server HTTP configuration
+# Server configuration
 server:
   http_listen_port: 4040
   log_level: info
@@ -17,19 +17,19 @@ server:
 storage:
   backend: filesystem
   filesystem:
-    path: /var/lib/pyroscope
+    dir: /var/lib/pyroscope
 
-# Memberlist for clustering (empty for single instance)
+# Memberlist (empty for single instance)
 memberlist:
   join_members: []
 
-# Limits and retention
+# Limits
 limits:
-  max_query_length: 721h  # ~30 days
+  max_query_length: 721h
 
-# Compactor settings
+# Compactor
 compactor:
-  data_path: /var/lib/pyroscope/compactor
+  working_directory: /var/lib/pyroscope/compactor
   compaction_interval: 10m
 
 # Analytics
