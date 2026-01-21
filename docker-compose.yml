@@ -20,9 +20,9 @@ services:
     image: grafana/tempo:latest
     command: [ "-config.file=/etc/tempo/tempo.yml" ]
     # ports:
-    #   - "3200:3200"   # Tempo HTTP
-    #   - "4317:4317"   # OTLP gRPC
-    #   - "4318:4318"   # OTLP HTTP
+      # - "3200:3200"   # Tempo HTTP
+      # - "4317:4317"   # OTLP gRPC
+      # - "4318:4318"   # OTLP HTTP
     volumes:
       - ./config/tempo/tempo.yml:/etc/tempo/tempo.yml
       - tempo-data:/var/tempo
@@ -34,8 +34,8 @@ services:
   loki:
     image: grafana/loki:latest
     command: [ "-config.file=/etc/loki/loki.yml" ]
-    # ports:
-    #   - "3100:3100"
+    ports:
+      - "3100:3100"
     volumes:
       - ./config/loki/loki.yml:/etc/loki/loki.yml
       - loki-data:/loki
@@ -85,10 +85,10 @@ services:
       - /etc/alloy/config.alloy
       - --server.http.listen-addr=0.0.0.0:12345
       - --storage.path=/var/lib/alloy/data
-    # ports:
+    ports:
     #   - "12345:12345"  # Alloy UI
-    #   - "4319:4317"    # OTLP gRPC receiver
-    #   - "4320:4318"    # OTLP HTTP receiver
+      - "4319:4317"    # OTLP gRPC receiver
+      - "4320:4318"    # OTLP HTTP receiver
     volumes:
       - ./config/alloy/config.alloy:/etc/alloy/config.alloy
       - alloy-data:/var/lib/alloy
