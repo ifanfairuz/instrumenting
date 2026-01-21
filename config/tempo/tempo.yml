@@ -1,3 +1,5 @@
+stream_over_http_enabled: true
+
 server:
   http_listen_port: 3200
 
@@ -13,10 +15,6 @@ distributor:
 ingester:
   max_block_duration: 30m
 
-compactor:
-  compaction:
-    block_retention: 24h
-
 storage:
   trace:
     backend: local
@@ -24,12 +22,6 @@ storage:
       path: /var/tempo/traces
     wal:
       path: /var/tempo/wal
-
-# Query configuration
-query_frontend:
-  search:
-    default_result_limit: 20
-    max_result_limit: 100
 
 # Metrics generator configuration
 metrics_generator:
@@ -42,47 +34,10 @@ metrics_generator:
     remote_write:
       - url: http://prometheus:9090/api/v1/write
         send_exemplars: true
-  traces_storage:
-    path: /var/tempo/generator/traces
-  processor:
-    service_graphs:
-      dimensions:
-        - http.method
-        - http.target
-        - http.status_code
-      histogram_buckets: [0.1, 0.2, 0.4, 0.8, 1.6, 3.2, 6.4, 12.8]
-      max_items: 10000
-    span_metrics:
-      dimensions:
-        - http.method
-        - http.target
-        - http.status_code
-      histogram_buckets:
-        [
-          0.002,
-          0.004,
-          0.008,
-          0.016,
-          0.032,
-          0.064,
-          0.128,
-          0.256,
-          0.512,
-          1.024,
-          2.048,
-          4.096,
-          8.192,
-          16.384,
-        ]
-      enable_target_info: true
-    local_blocks:
-      flush_check_period: 10s
-      max_live_traces: 10000
-      max_block_duration: 30m
-      complete_block_timeout: 5m
 
 # Global defaults (no multi-tenancy)
 overrides:
-  metrics_generator_processors: [service-graphs, span-metrics, local-blocks]
-  metrics_generator_max_active_series: 10000
-  metrics_generator_collection_interval: 15s
+  defaults:
+    metrics_generator:
+      processors: ["span-metrics", "service-graphs", "local-block"]
+      generate_native_histograms: both
