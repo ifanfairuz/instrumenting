@@ -53,6 +53,7 @@ services:
       - '--web.console.templates=/usr/share/prometheus/consoles'
       - '--storage.tsdb.retention.time=15d'
       - '--web.enable-lifecycle'
+      - '--web.enable-remote-write-receiver'
     # ports:
     #   - "9090:9090"
     volumes:
